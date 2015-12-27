@@ -24,6 +24,12 @@ from flap.path import Path, ROOT
 class File:
    
     def __init__(self, fileSystem, path, content):
+        # print('filesystem %r path %r c %s ' % (fileSystem, path, content) )
+        # s = path.__repr__()
+        # print('s = %s' % s)
+        # if 'tex/tex' in s:
+        #     print('riase')
+        #     raise ValueError()
         assert path, "Invalid path (found '%s')" % path.full()
         self.fileSystem = fileSystem
         self._path = path
@@ -68,15 +74,28 @@ class File:
         return self.fileSystem.open(self._path.container())
         
     def sibling(self, name):
+        print('name = %s' % name)
+        print('name2 = %s' % self._path.container())
+
+        # last = name[-4:]
+        # print('last = %s' % last)
+        # if last == '.tex':
+        #     name  = name[:-4]
+
+        if os.path.exists(name):
+            cur = Path.fromText('.')
+            return self.fileSystem.open(cur / name)
         return self.fileSystem.open(self._path.container() / name) 
     
     def files(self):
         return []
     
     def files_that_matches(self, pattern):
+        print('files_that_matches(self=%s, pattern=%s)' % (str(self._path), pattern))
         path = Path.fromText(str(self._path) + "/" + str(pattern)) 
         directory = self.fileSystem.open(path.container())
-        return [ file for file in directory.files() if re.search(path.fullname(), str(file.path())) ]
+        return [ file for file in directory.files() 
+            if re.search(path.fullname(), str(file.path())) ]
     
     def __repr__(self):
         return self.path()
@@ -191,6 +210,7 @@ class OSFileSystem(FileSystem):
         assert path, "Invalid path (found '%s')" % path
         osPath = self.forOS(path)
         with open(osPath) as file:
+            print('load(%r)' %  osPath)
             return file.read()
 
 

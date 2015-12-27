@@ -123,8 +123,8 @@ class Controller:
         except TexFileNotFound as error:
             self._ui.report_missing_tex_file(error.fragment())
 
-        except Exception as error:
-            self._ui.report_unexpected_error(str(error))
+        # except Exception as error:
+        #     self._ui.report_unexpected_error(str(error))
 
     def parse(self, arguments):
         if len(arguments) < 3 or len(arguments) > 4:

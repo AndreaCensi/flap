@@ -49,3 +49,7 @@ Here is a list of features, which are not yet supported:
 . Support for backward relative links in directives, for instance `\input{../img/foo}`.
 . Support for star-form of directives, such as `\includegraphics*{foo}`
 . Adjust copyright and credits in flap.__init__.py
+. Support for includegraphics with full path
+. Support for spaces in graphics files
+. Clean support for .tex
+. Support for relative paths (e.g. main.tex includes tex/file1.tex includes tex/file2.tex)

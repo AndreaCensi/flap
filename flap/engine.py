@@ -18,6 +18,7 @@
 import re
 import itertools
 from flap.path import Path
+import os
 
 
 class Listener:
@@ -228,11 +229,16 @@ class Input(Substitution):
         super().__init__(delegate, flap)
         
     def prepare_pattern(self):
-        return re.compile(r"\\input\{([^}]+)\}")
+        # AC change: do not add parameterized expressions
+        return re.compile(r"\\input\{([^}#]+)\}")
    
     def replacements_for(self, fragment, match):
         self.flap.on_input(fragment)
-        included_file = self.file().sibling(match.group(1) + ".tex")
+        r = match.group(1)
+        # AC change: do not add extension if not required
+        if not '.tex' in r:
+             r += ".tex"
+        included_file = self.file().sibling(r)
         if included_file.isMissing():
             raise TexFileNotFound(fragment)
         return Processor.input_merger(included_file, self.flap).fragments()
@@ -382,6 +388,7 @@ class Flap:
         self.copy_resource_files()
 
     def open_file(self, source):
+        print('open_file: %s' % source)
         self._root = self._file_system.open(source)
         if self._root.isMissing():
             raise ValueError("The file '%s' could not be found." % source)
@@ -408,7 +415,15 @@ class Flap:
         return self._included_files and file not in self._included_files
 
     def find_graphics(self, fragment, text_path, extensions_by_priority):
-        candidates = self.graphics_directory().files_that_matches(Path.fromText(text_path))
+        print('text_path %r exentions %r' % (text_path,extensions_by_priority ))
+        gd = self.graphics_directory()
+        for a in extensions_by_priority:
+            fn =text_path + '.' + a
+            if os.path.exists(fn):
+                path =  Path.fromText(fn)
+                return self._file_system.open(path)
+        candidates = gd.files_that_matches(Path.fromText(text_path))
+        print('candidates = %r' % candidates)
         for each_extension in extensions_by_priority:
             for each_graphic in candidates:
                 if each_graphic.extension() == each_extension:
@@ -418,6 +433,7 @@ class Flap:
     RESOURCE_FILES = ["cls", "sty", "bib", "bst"]       
         
     def on_input(self, fragment):
+        print('on_input %r' % fragment)
         self._listener.on_input(fragment)
     
     def on_include_graphics(self, fragment, graphicFile):
