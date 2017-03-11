@@ -211,7 +211,11 @@ class OSFileSystem(FileSystem):
         osPath = self.forOS(path)
         with open(osPath) as file:
             print('load(%r)' %  osPath)
-            return file.read()
+            try:
+                return file.read()
+            except:
+                print('error while reading %r' % path)
+                raise
 
 
 class InMemoryFileSystem(FileSystem):

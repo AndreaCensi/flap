@@ -420,10 +420,11 @@ class Flap:
         for a in extensions_by_priority:
             fn =text_path + '.' + a
             if os.path.exists(fn):
-                path =  Path.fromText(fn)
+                path = Path.fromText(fn)
                 return self._file_system.open(path)
         candidates = gd.files_that_matches(Path.fromText(text_path))
-        print('candidates = %r' % candidates)
+        print('type %s' % type(candidates))
+        #print('candidates = {}'.format(candidates))
         for each_extension in extensions_by_priority:
             for each_graphic in candidates:
                 if each_graphic.extension() == each_extension:
